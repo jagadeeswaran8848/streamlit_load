@@ -46,11 +46,26 @@ def main():
                 with cols[0]:
                     col_name = st.text_input(f'Column Name {i+1}', value=column['Column Name'], key=f'col_name_{i}')
                 with cols[1]:
-                    dtype = st.selectbox(f'Data Type {i+1}', ['VARCHAR', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'INT', 'BIGINT', 'FLOAT', 'DECIMAL', 'DATE', 'DATETIME', 'BOOLEAN'], index=['VARCHAR', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'INT', 'BIGINT', 'FLOAT', 'DECIMAL', 'DATE', 'DATETIME', 'BOOLEAN'].index(column['Data Type']), key=f'dtype_{i}')
+                    dtype = st.selectbox(
+                        f'Data Type {i+1}', 
+                        ['VARCHAR', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'INT', 'BIGINT', 'FLOAT', 'DECIMAL', 'DATE', 'DATETIME', 'BOOLEAN'], 
+                        index=['VARCHAR', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'INT', 'BIGINT', 'FLOAT', 'DECIMAL', 'DATE', 'DATETIME', 'BOOLEAN'].index(column['Data Type']), 
+                        key=f'dtype_{i}'
+                    )
                 with cols[2]:
-                    size = st.number_input(f'Size {i+1}', min_value=0, value=column['Size'] if dtype in ['VARCHAR'] else 0, key=f'size_{i}')
+                    size = st.number_input(
+                        f'Size {i+1}', 
+                        min_value=0, 
+                        value=column['Size'] if dtype in ['VARCHAR'] else 0, 
+                        key=f'size_{i}'
+                    )
                 with cols[3]:
-                    scale = st.number_input(f'Scale {i+1}', min_value=0, value=column['Scale'] if dtype == 'DECIMAL' else 0, key=f'scale_{i}')
+                    scale = st.number_input(
+                        f'Scale {i+1}', 
+                        min_value=0, 
+                        value=column['Scale'] if dtype == 'DECIMAL' else 0, 
+                        key=f'scale_{i}'
+                    )
                 
                 # Update the session state DataFrame
                 st.session_state.columns_config.at[i, 'Column Name'] = col_name
@@ -93,6 +108,14 @@ def main():
                     dtype = row['Data Type']
                     size = row['Size']
                     scale = row['Scale']
+
+                    # Ensure size and scale are integers and handle empty values
+                    try:
+                        size = int(size) if pd.notna(size) else 255
+                        scale = int(scale) if pd.notna(scale) else 0
+                    except ValueError:
+                        size = 255
+                        scale = 0
 
                     if dtype == 'VARCHAR':
                         dtype_dict[col_name] = sqlalchemy_types['VARCHAR'](size)
